@@ -1,4 +1,4 @@
-# Caleb-Hoff-s-GUI-Toolkit
+# Caleb-Hoff-GUI-Toolkit
 
 This toolkit aims to simplify the process of making stylish and modern, cross-platform GUIs.
 
