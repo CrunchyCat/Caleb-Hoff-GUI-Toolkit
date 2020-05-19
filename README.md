@@ -15,3 +15,4 @@ How to use:
 
 Final Notes:
 1) Due to how JFrameCH works, it is not recommended that you use the JFrame.setLayout() function. Instead, to control the layout it is recommended that you create a panel inside a JFrameCH and set its layout. This will prevent graphical issues from occuring with the title bar and window wrapper.
+2) Support for title bar icons is on the way. Currently an icon can be added, but it will only be shown in the operating system, rather than within the application frame.
