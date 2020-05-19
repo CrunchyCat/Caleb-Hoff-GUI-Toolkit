@@ -12,3 +12,6 @@ It's very simple to use. Just import the Caleb Hoff library and instantiate a JF
 
 How to use:
 <img src='https://i.postimg.cc/7YSd9QY2/code.png' alt='code'/>
+
+Final Notes:
+1) Due to how JFrameCH works, it is not recommended that you use the JFrame.setLayout() function. Instead, to control the layout it is recommended that you create a panel inside a JFrameCH and set its layout. This will prevent graphical issues from occuring with the title bar and window wrapper.
