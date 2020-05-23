@@ -8,11 +8,12 @@ public class JFrameCH extends javax.swing.JFrame
 										COLOR_TITLEBAR_HOVER_DEFAULT = javax.swing.UIManager.getColor("Button.darkShadow"),
 										COLOR_TITLEBAR_CLOSE_DEFAULT = new java.awt.Color(232, 17, 35);
 	private static final java.awt.Font FONT_TITLEBAR_DEFAULT = javax.swing.UIManager.getFont("Label.font");
-	private javax.swing.JPanel pnlTitleBar, pnlMain;
+	private javax.swing.JPanel pnlTitleBar;
 	private javax.swing.JLabel lblTitle;
 	private javax.swing.JButton btnMin, btnMax, btnClose;
+	private javax.swing.JMenuItem mniRestore, mniMove, mniSize, mniMin, mniMax;
 	private int xx, xy;
-	private ComponentResizer cr; //TODO Implement this
+	private ComponentResizer cr;
 	private java.awt.Color color_TitleBarBackground = COLOR_TITLEBAR_BACKGROUND_DEFAULT,
 							color_TitleBarForeground = COLOR_TITLEBAR_FOREGROUND_DEFAULT,
 							color_TitleBarHover = COLOR_TITLEBAR_HOVER_DEFAULT,
@@ -43,15 +44,12 @@ public class JFrameCH extends javax.swing.JFrame
 		init();
 	}
 	
-	private void init()
+	private void init() //Initializes new frame features
 	{
 		cr = new ComponentResizer();
 		cr.registerComponent(this);
 		setUndecorated(true);
 		super.setLayout(new java.awt.BorderLayout());
-		
-		pnlMain = new javax.swing.JPanel();
-		pnlMain.setBackground(COLOR_TITLEBAR_BACKGROUND_DEFAULT);
 		
 		pnlTitleBar = new javax.swing.JPanel();
 		pnlTitleBar.setPreferredSize(new java.awt.Dimension(0, 30));
@@ -68,8 +66,13 @@ public class JFrameCH extends javax.swing.JFrame
 		btnMin = new javax.swing.JButton();
 		btnMax = new javax.swing.JButton();
 		btnClose = new javax.swing.JButton();
+		mniRestore = new javax.swing.JMenuItem("Restore");
+		mniMove = new javax.swing.JMenuItem("Move");
+		mniSize = new javax.swing.JMenuItem("Size");
+		mniMin = new javax.swing.JMenuItem("Minimize");
+		mniMax = new javax.swing.JMenuItem("Maximize");
 		
-		if (OSUtils.getOS() == OSUtils.OS.MacOS)
+		if (OSUtils.getOS() == OSUtils.OS.MacOS) //Adds macOS features
 		{
 			btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icon_close_mac.png")));
 			btnMin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icon_min_mac.png")));
@@ -81,8 +84,53 @@ public class JFrameCH extends javax.swing.JFrame
 			pnlTitleBar.add(pnlActions, java.awt.BorderLayout.WEST);
 			lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		}
-		else
+		else //Adds Windows features
 		{
+			javax.swing.JPopupMenu mnuTitleBar = new javax.swing.JPopupMenu();
+			mnuTitleBar.setBorderPainted(false);
+			pnlTitleBar.setComponentPopupMenu(mnuTitleBar);
+			javax.swing.JMenuItem mniClose = new javax.swing.JMenuItem("Close"); 		
+			mniRestore.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/pop_restore.png")));
+			mniRestore.setEnabled(false);
+			mniMin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/pop_min.png")));
+			mniMax.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/pop_max.png")));
+			mniMax.setFont(new java.awt.Font(mniMax.getFont().getName(), java.awt.Font.BOLD, mniMax.getFont().getSize()));
+			mniClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/pop_close.png")));
+			mniClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.ActionEvent.ALT_MASK));
+			
+			mnuTitleBar.add(mniRestore);
+			mnuTitleBar.add(mniMove); //TODO: Add Move Functionality
+			mnuTitleBar.add(mniSize); //TODO: Add Size Functionality
+			mnuTitleBar.add(mniMin);
+			mnuTitleBar.add(mniMax);
+			mnuTitleBar.addSeparator();
+			mnuTitleBar.add(mniClose);
+			
+			mniRestore.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseReleased(java.awt.event.MouseEvent e) {
+					if (e.getButton() == java.awt.event.MouseEvent.BUTTON1)
+						setWindowState(javax.swing.JFrame.NORMAL);
+				}
+			});
+			mniMin.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseReleased(java.awt.event.MouseEvent e) {
+					if (e.getButton() == java.awt.event.MouseEvent.BUTTON1)
+						setWindowState(javax.swing.JFrame.ICONIFIED);
+				}
+			});
+			mniMax.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseReleased(java.awt.event.MouseEvent e) {
+					if (e.getButton() == java.awt.event.MouseEvent.BUTTON1)
+						setWindowState(javax.swing.JFrame.MAXIMIZED_BOTH);
+				}
+			});
+			mniClose.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseReleased(java.awt.event.MouseEvent e) {
+					if (e.getButton() == java.awt.event.MouseEvent.BUTTON1)
+						System.exit(0);
+				}
+			});
+			
 			btnMin.setIcon(filterResource("/img/icon_min.png", color_TitleBarForeground));
 			btnMax.setIcon(filterResource("/img/icon_max.png", color_TitleBarForeground));
 			btnClose.setIcon(filterResource("/img/icon_close.png", color_TitleBarForeground));
@@ -102,22 +150,23 @@ public class JFrameCH extends javax.swing.JFrame
 		}
 		
 		super.add(pnlTitleBar, java.awt.BorderLayout.NORTH);
-		super.add(pnlMain, java.awt.BorderLayout.CENTER);
 			
 		pnlTitleBar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
 		    public void mouseDragged(java.awt.event.MouseEvent e) {
 		    	if (getExtendedState() == javax.swing.JFrame.MAXIMIZED_BOTH)
-		    		setExtendedState(javax.swing.JFrame.NORMAL);
+		    		setWindowState(javax.swing.JFrame.NORMAL);
 		    	setLocation(e.getXOnScreen() - xx, e.getYOnScreen() - xy);
 		    }
 		});
 		pnlTitleBar.addMouseListener(new java.awt.event.MouseAdapter() {
 		    public void mouseClicked(java.awt.event.MouseEvent e) {
+		    	if (e.getButton() != java.awt.event.MouseEvent.BUTTON1)
+					return;
 		    	if (e.getClickCount() == 2 && !e.isConsumed()) {
-		            if (getExtendedState() == javax.swing.JFrame.MAXIMIZED_BOTH)
-		            	setExtendedState(javax.swing.JFrame.NORMAL);
-		            else
-		            	setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+		    		if (getExtendedState() == javax.swing.JFrame.MAXIMIZED_BOTH)
+			    		setWindowState(javax.swing.JFrame.NORMAL);
+					else
+						setWindowState(javax.swing.JFrame.MAXIMIZED_BOTH);
 		        }
 		    }
 		    public void mousePressed(java.awt.event.MouseEvent e) {
@@ -127,7 +176,8 @@ public class JFrameCH extends javax.swing.JFrame
 		});
 		btnMin.addMouseListener(new java.awt.event.MouseAdapter() {
 		    public void mouseReleased(java.awt.event.MouseEvent e) {
-		    	setState(javax.swing.JFrame.ICONIFIED);
+		    	if (e.getButton() == java.awt.event.MouseEvent.BUTTON1)
+		    		setWindowState(javax.swing.JFrame.ICONIFIED);
 		    }
 		    public void mouseEntered(java.awt.event.MouseEvent e) {
 				btnMin.setBackground(color_TitleBarHover);
@@ -138,10 +188,12 @@ public class JFrameCH extends javax.swing.JFrame
 		});
 		btnMax.addMouseListener(new java.awt.event.MouseAdapter() {
 		    public void mouseReleased(java.awt.event.MouseEvent e) {
+		    	if (e.getButton() != java.awt.event.MouseEvent.BUTTON1)
+					return;
 		    	if (getExtendedState() == javax.swing.JFrame.MAXIMIZED_BOTH)
-		    		setExtendedState(javax.swing.JFrame.NORMAL);
+		    		setWindowState(javax.swing.JFrame.NORMAL);
 				else
-					setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+					setWindowState(javax.swing.JFrame.MAXIMIZED_BOTH);
 		    }
 		    public void mouseEntered(java.awt.event.MouseEvent e) {
 				btnMax.setBackground(color_TitleBarHover);
@@ -152,7 +204,8 @@ public class JFrameCH extends javax.swing.JFrame
 		});
 		btnClose.addMouseListener(new java.awt.event.MouseAdapter() {
 		    public void mouseReleased(java.awt.event.MouseEvent e) {
-		    	System.exit(0);
+		    	if (e.getButton() == java.awt.event.MouseEvent.BUTTON1)
+		    		System.exit(0);
 		    }
 		    public void mouseEntered(java.awt.event.MouseEvent e) {
 				btnClose.setBackground(color_TitleBarClose);
@@ -161,14 +214,6 @@ public class JFrameCH extends javax.swing.JFrame
 				btnClose.setBackground(color_TitleBarBackground);
 			}
 		});
-	}
-	
-	/**
-	 * Returns the background color of the main panel
-	 */
-	public java.awt.Color getFrameBackground()
-	{
-		return pnlMain.getBackground();
 	}
 	
 	/**
@@ -196,14 +241,6 @@ public class JFrameCH extends javax.swing.JFrame
 	public java.awt.Color getTitleBarForeground()
 	{
 		return color_TitleBarForeground;
-	}
-	
-	/**
-	 * Sets the background color for the main panel
-	 */
-	public void setFrameBackground(java.awt.Color colorBG)
-	{
-		pnlMain.setBackground(colorBG);
 	}
 	
 	/**
@@ -274,6 +311,50 @@ public class JFrameCH extends javax.swing.JFrame
 		}
 	}
 	
+	/**
+	 * Sets if window is maximized, normal, or minimized
+	 * @param state - Maximized (6), Normal (0), or Minimized (1)
+	 */
+	private void setWindowState(int state)
+	{
+		if (state == javax.swing.JFrame.MAXIMIZED_BOTH) //Maximize Window
+		{
+			setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+			mniRestore.setEnabled(true);
+			mniMove.setEnabled(false);
+			mniSize.setEnabled(false);
+			mniMin.setEnabled(true);
+			mniMax.setEnabled(false);
+			mniMax.setFont(new java.awt.Font(mniMax.getFont().getName(), java.awt.Font.PLAIN, mniMax.getFont().getSize()));
+		}
+		else if (state == javax.swing.JFrame.ICONIFIED) //Minimize Window
+		{
+			setExtendedState(javax.swing.JFrame.ICONIFIED);
+			mniRestore.setEnabled(true);
+			mniMove.setEnabled(false);
+			mniSize.setEnabled(false);
+			mniMin.setEnabled(false);
+			mniMax.setEnabled(true);
+			mniMax.setFont(new java.awt.Font(mniMax.getFont().getName(), java.awt.Font.PLAIN, mniMax.getFont().getSize()));
+		}
+		else //Windowify window
+		{
+			setExtendedState(javax.swing.JFrame.NORMAL);
+			mniRestore.setEnabled(false);
+			mniMove.setEnabled(true);
+			mniSize.setEnabled(true);
+			mniMin.setEnabled(true);
+			mniMax.setEnabled(true);
+			mniMax.setFont(new java.awt.Font(mniMax.getFont().getName(), java.awt.Font.BOLD, mniMax.getFont().getSize()));
+		}
+	}
+	
+	/**
+	 * Applies color tint to an image resource at a URL
+	 * @param resource - image specified by URL string
+	 * @param color - the color to tint the image
+	 * @return the tinted image as an ImageIcon
+	 */
 	private javax.swing.ImageIcon filterResource(String resource, java.awt.Color color)
 	{
 		try
@@ -289,6 +370,10 @@ public class JFrameCH extends javax.swing.JFrame
 			return new javax.swing.ImageIcon(getClass().getResource(resource));
 	}
 	
+	/**
+	 * Determines the host operating system
+	 * @author Caleb
+	 */
 	public static class OSUtils
 	{
 		public static enum OS {Windows, MacOS, Linux, Other}
