@@ -5,7 +5,7 @@ public class JFrameCH extends javax.swing.JFrame
 	private static final long serialVersionUID = 1L;
 	private static final java.awt.Color COLOR_TITLEBAR_BACKGROUND_DEFAULT = javax.swing.UIManager.getColor("Frame.background"),
 										COLOR_TITLEBAR_FOREGROUND_DEFAULT = javax.swing.UIManager.getColor("Frame.foreground"),
-										COLOR_TITLEBAR_HOVER_DEFAULT = javax.swing.UIManager.getColor("Button.darkShadow"),
+										COLOR_TITLEBAR_HOVER_DEFAULT = javax.swing.UIManager.getColor("Button.shadow"),
 										COLOR_TITLEBAR_CLOSE_DEFAULT = new java.awt.Color(232, 17, 35);
 	private static final java.awt.Font FONT_TITLEBAR_DEFAULT = javax.swing.UIManager.getFont("Label.font");
 	private javax.swing.JPanel pnlTitleBar;
@@ -20,31 +20,59 @@ public class JFrameCH extends javax.swing.JFrame
 							color_TitleBarClose = COLOR_TITLEBAR_CLOSE_DEFAULT;
 	private java.awt.Font font_TitleBar = FONT_TITLEBAR_DEFAULT;
 
+	/**
+	 * Constructs a new JFrameCH that is initially invisible.
+	 * This constructor sets the component's locale property to the value returned by
+	 * JComponent.getDefaultLocale.
+	 */
 	public JFrameCH()
 	{
 		super();
 		init();
 	}
 	
+	/**
+	 * Creates a JFrameCH in the specified GraphicsConfiguration of a screen device and a blank title.
+	 * This constructor sets the component's locale property to the value returned by
+	 * JComponent.getDefaultLocale.
+	 * @param gc - the graphics configuration used to construct the new frame
+	 */
 	public JFrameCH(java.awt.GraphicsConfiguration gc)
 	{
 		super(gc);
 		init();
 	}
 	
+	/**
+	 * Creates a new, initially invisible JFrameCH with the specified title. 
+	 * This constructor sets the component's locale property to the value returned by
+	 * JComponent.getDefaultLocale.
+	 * @param title - the title of the new frame
+	 */
 	public JFrameCH(String title)
 	{
 		super(title);
 		init();
 	}
 	
+	/**
+	 * Creates a JFrameCH in the specified GraphicsConfiguration of a screen device and specified title.
+	 * This constructor sets the component's locale property to the value returned by
+	 * JComponent.getDefaultLocale.
+	 * @param title - the title of the new frame
+	 * @param gc - the graphics configuration used to construct the new frame
+	 */
 	public JFrameCH(String title, java.awt.GraphicsConfiguration gc)
 	{
 		super(title, gc);
 		init();
 	}
 	
-	private void init() //Initializes new frame features
+	/**
+	 * Converts ordinary JFrame to JFrameCH by creating a title bar,
+	 * title bar popup menu, window movement/size control
+	 */
+	private void init()
 	{
 		cr = new ComponentResizer();
 		cr.registerComponent(this);
@@ -73,10 +101,13 @@ public class JFrameCH extends javax.swing.JFrame
 		mniMax = new javax.swing.JMenuItem("Maximize");
 		
 		if (OSUtils.getOS() == OSUtils.OS.MacOS) //Adds macOS features
-		{
+		{ //TODO: Fix Button Highlighting on MacOS
 			btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icon_close_mac.png")));
 			btnMin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icon_min_mac.png")));
 			btnMax.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icon_max_mac.png")));
+			btnClose.setPreferredSize(new java.awt.Dimension(25, 20));
+			btnMin.setPreferredSize(new java.awt.Dimension(25, 20));
+			btnMax.setPreferredSize(new java.awt.Dimension(25, 20));
 			pnlActions.add(btnClose);
 			pnlActions.add(btnMin);
 			pnlActions.add(btnMax);
@@ -141,7 +172,7 @@ public class JFrameCH extends javax.swing.JFrame
 			pnlTitleBar.add(pnlActions, java.awt.BorderLayout.EAST);
 		}
 		
-		for (java.awt.Component btn : pnlActions.getComponents())
+		for (java.awt.Component btn : pnlActions.getComponents()) //Sets up action buttons
 		{
 			btn.setBackground(color_TitleBarBackground);
 			((javax.swing.JButton)btn).setContentAreaFilled(false);
@@ -367,7 +398,7 @@ public class JFrameCH extends javax.swing.JFrame
 		    return new javax.swing.ImageIcon(img);
 		}
 		catch (Exception e) {}
-			return new javax.swing.ImageIcon(getClass().getResource(resource));
+		return new javax.swing.ImageIcon(getClass().getResource(resource));
 	}
 	
 	/**
